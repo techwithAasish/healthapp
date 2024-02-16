@@ -244,6 +244,22 @@ fun InputReadingsScreen(
               Text(text = stringResource(id = R.string.load_button))
             }
 
+            Button(
+              enabled = hasValidDoubleInRange(weightInput) && heartRateInput.isDigitsOnly(),
+              onClick = {
+                onInsertClick(weightInput.toDouble())
+                onInsertClick(heartRateInput.toDouble())
+                onInsertClick(dateTimeInput.toDouble())
+                // clear TextField when new weight is entered
+                weightInput = ""
+                heartRateInput = ""
+                dateTimeInput = ""
+              },
+              modifier = Modifier.weight(1f)
+            ) {
+              Text(text = stringResource(id = R.string.add_readings_button))
+            }
+
 
           }
         }
