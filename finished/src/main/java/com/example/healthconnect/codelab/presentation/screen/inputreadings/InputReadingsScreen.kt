@@ -322,6 +322,85 @@ private fun saveReading(heartRate: Int, dateTimeInput: String) {
     }
 }
 
+
+It looks like you are trying to implement the save and load functionality for heart rate and timestamp readings using the Health Connect SDK in Android. Below is an example implementation for the Save and Load buttons:
+
+kotlin
+Copy code
+// Inside the InputReadingsScreen function
+
+// ...
+
+// Load button click handler
+Button(
+onClick = {
+  // Call a function to load and display heart rate/timestamp readings
+  loadReadings()
+},
+modifier = Modifier.weight(1f)
+) {
+  Text(text = stringResource(id = R.string.load_button))
+}
+
+// Save button click handler
+Button(
+enabled = hasValidDoubleInRange(weightInput) && heartRateInput.isDigitsOnly(),
+onClick = {
+  // Call a function to save new heart rate/timestamp readings
+  saveReading(heartRateInput.toInt(), dateTimeInput)
+
+  // Clear input fields
+  weightInput = ""
+  heartRateInput = ""
+  dateTimeInput = ""
+},
+modifier = Modifier.weight(1f)
+) {
+  Text(text = stringResource(id = R.string.add_readings_button))
+}
+
+// ...
+
+// Function to save heart rate/timestamp readings using Health Connect SDK
+private fun saveReading(heartRate: Int, dateTimeInput: String) {
+  // Create a HeartRateRecord.Sample using the provided parameters
+  val heartRateRecord = HeartRateRecord.Sample.newBuilder()
+    .setHeartRate(heartRate)
+    .setTime(dateTimeInput) // You may need to convert dateTimeInput to a suitable format
+    .build()
+
+  // Use the HealthConnectClient to write the record
+  HealthConnect.getClient(requireContext()).recordsClient.write(heartRateRecord)
+    .addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        // Handle successful write
+        // You may want to refresh the UI or perform any other actions
+      } else {
+        // Handle write failure
+        val exception = task.exception
+        // Handle the exception accordingly
+      }
+    }
+}
+
+// Function to load and display heart rate/timestamp readings using Health Connect SDK
+private fun loadReadings() {
+  // Use the HealthConnectClient to read heart rate records
+  HealthConnect.getClient(requireContext()).recordsClient.read(HeartRateRecord.Sample::class.java)
+    .addOnCompleteListener { task ->
+      try {
+        val response =  healthConnectClient.readRecords(
+          )
+        )
+        for (record in response.records) {
+          // Process each record
+        }
+      } catch (e: Exception) {
+        // Run error handling here
+      }
+    }
+}
+
 @Preview
 @Composable
 fun InputReadingsScreenPreview() {
