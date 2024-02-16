@@ -129,6 +129,9 @@
   <string name="differential_changes_type_distance">Distance</string>
   <string name="differential_changes_type_weight">Weight</string>
 
+  <string name="valid_heart_rate_error_message">Please enter a valid heart rate.</string>
+  <string name="load_button">Load</string>
+
   <!-- Health Connect settings -->
   <string name="settings">Settings</string>
 </resources>

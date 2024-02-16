@@ -16,14 +16,19 @@
 package com.example.healthconnect.codelab.presentation.screen.inputreadings
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -42,6 +47,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.isDigitsOnly
 import androidx.health.connect.client.records.WeightRecord
 import androidx.health.connect.client.units.Mass
 import com.example.healthconnect.codelab.R
@@ -86,6 +92,9 @@ fun InputReadingsScreen(
   }
 
   var weightInput by remember { mutableStateOf("") }
+
+  var heartRateInput by remember { mutableStateOf("") }
+  var dateTimeInput by remember { mutableStateOf("") }
 
   // Check if the input value is a valid weight
   fun hasValidDoubleInRange(weight: String): Boolean {
@@ -180,6 +189,107 @@ fun InputReadingsScreen(
           } else {
             Text(text = "$weeklyAvg".take(5) + stringResource(id = R.string.kilograms))
           }
+        }
+        item {
+          Text("Assignment 2", fontSize = 24.sp,
+            color = MaterialTheme.colors.primary,
+            modifier = Modifier.padding(top = 20.dp)
+          )
+        }
+        item {
+          // Heart Rate input field
+          OutlinedTextField(
+            value = heartRateInput,
+            onValueChange = {
+              heartRateInput = it
+            },
+            label = {
+              Text("Enter Heart Rate")
+            },
+            isError = !heartRateInput.isDigitsOnly(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+          )
+          if (!heartRateInput.isDigitsOnly()) {
+            Text(
+              text = stringResource(id = R.string.valid_heart_rate_error_message),
+              color = MaterialTheme.colors.error,
+              style = MaterialTheme.typography.caption,
+              modifier = Modifier.padding(start = 16.dp)
+            )
+          }
+
+          // Date/Time input field
+          OutlinedTextField(
+            value = dateTimeInput,
+            onValueChange = {
+              dateTimeInput = it
+            },
+            label = {
+              Text("Enter Date / Time")
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+          )
+
+          // Load and Save buttons
+          Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Button(
+              onClick = {
+                // Implement Load button functionality
+              },
+              modifier = Modifier.weight(1f)
+            ) {
+              Text(text = stringResource(id = R.string.load_button))
+            }
+
+            Button(
+              enabled = hasValidDoubleInRange(weightInput) && heartRateInput.isDigitsOnly(),
+              onClick = {
+                onInsertClick(weightInput.toDouble())
+                onInsertClick(heartRateInput.toDouble())
+                onInsertClick(dateTimeInput.toDouble())
+                // clear TextField when new weight is entered
+                weightInput = ""
+                heartRateInput = ""
+                dateTimeInput = ""
+              },
+              modifier = Modifier.weight(1f)
+            ) {
+              Text(text = stringResource(id = R.string.add_readings_button))
+            }
+          }
+        }
+        item {
+          Box(
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(150.dp)
+              .padding(vertical = 20.dp)
+          ) {
+            Text(
+              text = stringResource(id = R.string.previous_readings),
+              fontSize = 24.sp,
+              color = MaterialTheme.colors.primary,
+              modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+            )
+          }
+        }
+        item {
+          Text(
+            "Name: Aasish Mahato",
+            fontSize = 18.sp,
+            color = MaterialTheme.colors.error,
+            modifier = Modifier.padding(top = 10.dp)
+          )
+          Text(
+            "ID: 301373719",
+            fontSize = 18.sp,
+            color = MaterialTheme.colors.error
+          )
         }
       }
     }
