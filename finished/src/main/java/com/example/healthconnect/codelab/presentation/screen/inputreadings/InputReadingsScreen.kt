@@ -47,7 +47,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.text.isDigitsOnly
+import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.WeightRecord
 import androidx.health.connect.client.units.Mass
 import com.example.healthconnect.codelab.R
@@ -237,7 +239,7 @@ fun InputReadingsScreen(
           ) {
             Button(
               onClick = {
-
+                loadReadings()
               },
               modifier = Modifier.weight(1f)
             ) {
@@ -245,17 +247,18 @@ fun InputReadingsScreen(
             }
 
             Button(
-              enabled = hasValidDoubleInRange(weightInput) && heartRateInput.isDigitsOnly(),
-              onClick = {
-                onInsertClick(weightInput.toDouble())
-                onInsertClick(heartRateInput.toDouble())
-                onInsertClick(dateTimeInput.toDouble())
-                // clear TextField when new weight is entered
-                weightInput = ""
-                heartRateInput = ""
-                dateTimeInput = ""
-              },
-              modifier = Modifier.weight(1f)
+              saveReading(heartRateInput.toInt(), dateTimeInput)
+//              enabled = hasValidDoubleInRange(weightInput) && heartRateInput.isDigitsOnly(),
+//              onClick = {
+//                onInsertClick(weightInput.toDouble())
+//                onInsertClick(heartRateInput.toDouble())
+//                onInsertClick(dateTimeInput.toDouble())
+//                // clear TextField when new weight is entered
+//                weightInput = ""
+//                heartRateInput = ""
+//                dateTimeInput = ""
+//              },
+//              modifier = Modifier.weight(1f)
             ) {
               Text(text = stringResource(id = R.string.add_readings_button))
             }
@@ -296,6 +299,27 @@ fun InputReadingsScreen(
       }
     }
   }
+}
+
+private fun saveReading(heartRate: Int, dateTimeInput: String) {
+  // Create a HeartRateRecord.Sample using the provided parameters
+  val heartRateRecord = HeartRateRecord.Sample.newBuilder()
+    .setHeartRate(heartRate)
+    .setTime(dateTimeInput) // You may need to convert dateTimeInput to a suitable format
+    .build()
+
+  // Use the HealthConnectClient to write the record
+  HealthConnect.getClient(requireContext()).recordsClient.write(heartRateRecord)
+    .addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        // Handle successful write
+        // You may want to refresh the UI or perform any other actions
+      } else {
+        // Handle write failure
+        val exception = task.exception
+        // Handle the exception accordingly
+      }
+    }
 }
 
 @Preview
